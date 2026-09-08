@@ -13,7 +13,7 @@ Neste encontro iremos abordar o crescimento extremo e exponencial de acesso aos 
 
 ## Impactos no seu projeto
 
-Sua aplicação da Globoplay precisa ter recursos de auto scalling e gestão na carga entre os computadores internos. A instrução de hoje ensina como fazer isso.
+Sua aplicação da Globoplay precisa de recursos de auto scalling e gestão na carga entre os computadores internos. A instrução de hoje ensina como fazer isso.
 
 ## Não faça
 
