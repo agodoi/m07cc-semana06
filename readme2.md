@@ -1,4 +1,4 @@
-# Computação Ágil e Elástica (parte prática — como medir)
+# Computação Ágil e Elástica (parte prática: como medir)
 
 Neste encontro vamos montar, na prática, uma arquitetura que aguenta crescimento de acessos: um balanceador de carga (ELB) na frente de um grupo de servidores que cresce e encolhe sozinho (Auto Scaling). Depois, vamos **medir** esse comportamento: gerar carga, observar os alarmes do CloudWatch e ver o grupo escalar para cima e para baixo.
 
@@ -89,7 +89,7 @@ Os Passos 01 a 07 abaixo descrevem o **Caminho A**. O Caminho B reaproveita a l�
 
 ---
 
-# CAMINHO A — Laboratório do Módulo 10
+# CAMINHO A: Laboratório do Módulo 10
 
 ## Passo-01: Criar uma AMI para o Auto Scaling
 
@@ -115,7 +115,7 @@ Você vai tirar uma "foto" da instância **Web Server 1**. É dessa foto que o A
 
 ## Passo-02: Criar o grupo de destino e o ELB
 
-### 2.A — Grupo de destino
+### 2.A: Grupo de destino
 
 **2.1)** No painel à esquerda, em **Balanceamento de carga**, escolha **Grupos de destino**.
 
@@ -143,7 +143,7 @@ Não altere nada e selecione **Próximo**.
 
 **Checkpoint:** o **LabGroup** aparece na lista com **0 destinos**. É isso mesmo.
 
-### 2.B — Balanceador de carga
+### 2.B: Balanceador de carga
 
 **2.9)** No painel à esquerda, escolha **Balanceadores de carga** e depois **Criar balanceador de carga**.
 
@@ -172,7 +172,7 @@ Não altere nada e selecione **Próximo**.
 
 ## Passo-03: Criar o modelo de execução e o grupo do Auto Scaling
 
-### 3.A — Modelo de execução
+### 3.A: Modelo de execução
 
 O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual AMI, qual tamanho, qual chave, qual grupo de segurança. [Definição](https://github.com/agodoi/m07-semana06/blob/main/doc/definicao-ModeloDeExecucao.md)
 
@@ -196,17 +196,17 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 **3.10)** Na tela de sucesso, clique no link do modelo **LabConfig**.
 
-### 3.B — Grupo do Auto Scaling
+### 3.B: Grupo do Auto Scaling
 
 **3.11)** No menu **Ações**, selecione **Criar grupo do Auto Scaling**. O assistente tem 7 etapas; acompanhe no painel à esquerda.
 
-**Etapa 1 — Modelo de execução**
+**Etapa 1: Modelo de execução**
 
 - Nome do grupo: **Lab Auto Scaling Group**
 - Modelo de execução: confirme que é **LabConfig**
 - Selecione **Próximo**
 
-**Etapa 2 — Opções de execução da instância**
+**Etapa 2: Opções de execução da instância**
 
 - VPC: **Lab VPC**
 - Zonas de disponibilidade e sub-redes: **Sub-rede privada 1** e **Sub-rede privada 2**
@@ -215,14 +215,14 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 - Selecione **Próximo**
 
-**Etapa 3 — Opções avançadas**
+**Etapa 3: Opções avançadas**
 
 - Marque **Anexar a um balanceador de carga existente**.
 - Em **Grupos de destino de balanceador de carga existentes**, selecione **LabGroup | HTTP**.
 - Em **Configurações adicionais**, marque **Habilitar coleta de métricas de grupo no CloudWatch**.
 - Selecione **Próximo**
 
-**Etapa 4 — Tamanho do grupo e políticas de escalabilidade**
+**Etapa 4: Tamanho do grupo e políticas de escalabilidade**
 
 - Capacidade desejada: **2**
 - Capacidade mínima: **2**
@@ -239,16 +239,16 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 - Selecione **Próximo**
 
-**Etapa 5 — Notificações**
+**Etapa 5: Notificações**
 
 - Não altere nada. Selecione **Próximo**. (No projeto, vale configurar um e-mail via SNS para saber quando o grupo escalar.)
 
-**Etapa 6 — Tags**
+**Etapa 6: Tags**
 
 - Clique em **Adicionar tag**: Chave **Name**, Valor **Lab Instance**.
 - Selecione **Próximo**
 
-**Etapa 7 — Revisão**
+**Etapa 7: Revisão**
 
 - Confira e clique em **Criar grupo do Auto Scaling**.
 
@@ -266,7 +266,7 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 **4.3)** Duas instâncias **Lab Instance** devem estar listadas. Aguarde até que o **Status** das duas mude para **íntegro** (healthy). Atualize a tela se necessário.
 
-> **Íntegro** significa que a instância respondeu ao health check com o código de sucesso configurado — nesta prática, **HTTP 200** — e que o ELB pode encaminhar tráfego para ela. Uma instância **não íntegra** deixa de receber tráfego do ALB. Como você habilitou os **Elastic Load Balancing health checks** no Auto Scaling Group, o Auto Scaling também pode marcar essa instância como não íntegra e substituí-la.
+> **Íntegro** significa que a instância respondeu ao health check com o código de sucesso configurado (nesta prática), **HTTP 200**, e que o ELB pode encaminhar tráfego para ela. Uma instância **não íntegra** deixa de receber tráfego do ALB. Como você habilitou os **Elastic Load Balancing health checks** no Auto Scaling Group, o Auto Scaling também pode marcar essa instância como não íntegra e substituí-la.
 
 **4.4)** No painel à esquerda, escolha **Balanceadores de carga** e clique em **LabELB**.
 
@@ -282,14 +282,14 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 Hoje o grupo tem 2 instâncias porque o mínimo é 2 e não há carga. Agora você vai forçar a CPU a subir e ver o Auto Scaling responder.
 
-### 5.A — Localizar os alarmes
+### 5.A: Localizar os alarmes
 
 **5.1)** Mantenha a aba da aplicação aberta. Em outra aba, no console, pesquise e selecione **CloudWatch**.
 
 **5.2)** No painel à esquerda, expanda **Alarmes** e selecione **Todos os alarmes**. A política de rastreamento de destino cria e gerencia automaticamente alarmes do CloudWatch para controlar o **scale-out** e o **scale-in**. Os nomes normalmente contêm trechos como **AlarmHigh** e **AlarmLow**.
 
-- **AlarmHigh** — participa do **scale-out** quando a métrica permanece acima do nível necessário para manter o objetivo configurado.
-- **AlarmLow** — participa do **scale-in** quando a métrica cai o suficiente para que o grupo possa remover capacidade sem voltar imediatamente acima do objetivo.
+- **AlarmHigh**: participa do **scale-out** quando a métrica permanece acima do nível necessário para manter o objetivo configurado.
+- **AlarmLow**: participa do **scale-in** quando a métrica cai o suficiente para que o grupo possa remover capacidade sem voltar imediatamente acima do objetivo.
 
 > Não crie, edite nem exclua manualmente esses alarmes. Eles pertencem à política de **Target Tracking** e podem ser ajustados ou recriados automaticamente pelo Auto Scaling.
 
@@ -297,7 +297,7 @@ Hoje o grupo tem 2 instâncias porque o mínimo é 2 e não há carga. Agora voc
 
 **5.3)** Clique no alarme que tem **AlarmHigh** no nome. Ele deve estar no estado **OK**, que significa que **não** foi acionado, e o gráfico deve mostrar CPU baixa. Observe no próprio alarme o limiar e a quantidade de períodos de avaliação definidos automaticamente pela política.
 
-### 5.B — Gerar carga
+### 5.B: Gerar carga
 
 **5.4)** Volte à aba da aplicação e clique em **Load Test**, ao lado do logotipo da AWS. A página passa a gerar requisições continuamente pelo ELB, que as distribui entre os destinos íntegros, aumentando a carga sobre o grupo. **Não feche esta aba.**
 
@@ -353,7 +353,7 @@ A **Web Server 1** serviu apenas para gerar a AMI. As Lab Instance foram criadas
 
 ---
 
-# CAMINHO B — Arquitetura Corporativa com teste K6
+# CAMINHO B: Arquitetura Corporativa com teste K6
 
 Use este caminho no projeto ou se sobrar tempo. A lógica é a mesma do Caminho A; o que muda é a rede (a sua), a aplicação (um Apache simples) e a forma de gerar carga (K6 a partir do bastion, contra o ELB).
 
@@ -388,10 +388,10 @@ Para usar um Application Load Balancer e um Auto Scaling Group distribuídos em 
 
 **B-1.3)** Confirme que a VPC agora possui as quatro sub-redes usadas neste laboratório:
 
-- **Sub\_Publica\_a** — `us-east-1a`
-- **Sub\_Publica\_b** — `us-east-1b`
-- **Sub\_Privada\_a** — `us-east-1a`
-- **Sub\_Privada\_b** — `us-east-1b`
+- **Sub\_Publica\_a**: `us-east-1a`
+- **Sub\_Publica\_b**: `us-east-1b`
+- **Sub\_Privada\_a**: `us-east-1a`
+- **Sub\_Privada\_b**: `us-east-1b`
 
 > Para esta prática, as duas sub-redes privadas podem usar a mesma tabela de rotas privada e o mesmo NAT Gateway. Em uma arquitetura de produção que também exija alta disponibilidade para a saída à internet, é comum utilizar um NAT Gateway por Zona de Disponibilidade.
 
