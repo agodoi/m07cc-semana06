@@ -56,7 +56,7 @@ Antes de clicar, alinhe o vocabulário. Você vai ser cobrado nas perguntas de r
 
 Tipos de balanceador que você vai ver no console:
 
-| Tipo Camada OSI Uso principal       |                |                                                                                                               |
+| Tipo Camada                         | OSI            | Uso principal                                                                                                 |
 | ----------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------- |
 | **Application Load Balancer (ALB)** | 7 (aplicação)  | HTTP/HTTPS, roteia por URL, cabeçalhos etc. Ideal para aplicações web e microsserviços. **É o que usaremos.** |
 | **Network Load Balancer (NLB)**     | 4 (transporte) | TCP/UDP de altíssimo desempenho e baixa latência (jogos, streaming).                                          |
