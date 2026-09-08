@@ -78,7 +78,7 @@ Várias telas do console demoram alguns segundos para refletir o que acabou de a
 
 ## Escolha o seu caminho
 
-| **Caminho A — Laboratório do Módulo 10** **Caminho B — Arquitetura Corporativa**  |                                         |                                                  |
+|    |                                         | **Caminho A — Laboratório do Módulo 10**  | **Caminho B — Arquitetura Corporativa**
 | --------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------ |
 | Quando usar                                                                       | **Na aula de hoje.**                    | No seu projeto, ou se sobrar tempo.              |
 | Ponto de partida                                                                  | Instância **Web Server 1** do Módulo 10 | VPC\_Arquitetura\_Corp com bastion + EC2 privado |
