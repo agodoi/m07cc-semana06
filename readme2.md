@@ -13,8 +13,9 @@ Ao final desta instrução você será capaz de:
 3. Criar um **modelo de execução** e um **grupo do Auto Scaling** ligado ao ELB.
 4. Verificar que o balanceamento funciona acessando a aplicação pelo DNS do ELB.
 5. Gerar carga, observar os alarmes do CloudWatch e ver o grupo **escalar para cima (scale-out)**.
-6. Observar o grupo **escalar para baixo (scale-in)** quando a carga cessa.
-7. *(Caminho B)* Usar o **K6** a partir de um bastion host para gerar carga controlada contra o ELB.
+6. Encerrar a instância **Web Server 1** após confirmar o funcionamento do Auto Scaling, seguindo a sequência oficial do Laboratório 6.
+7. *(Atividade complementar)* Observar o grupo **escalar para baixo (scale-in)** quando a carga cessa.
+8. *(Caminho B)* Usar o **K6** a partir de um bastion host para gerar carga controlada contra o ELB.
 
 ## Pré-requisitos
 
@@ -30,7 +31,7 @@ Ao final desta instrução você será capaz de:
 | Passo 4 (verificar balanceamento)       | 10 min   |
 | Passo 5 (teste de carga e observação)   | 25 min   |
 | Passo 6 (scale-in) e Passo 7 (encerrar) | 15 min   |
-| Caminho B completo (com K6)             | + 45 min --> quem fizer, ganhará uma gratificação. Mandar vídeo até 23h59 de hoje no slack. Contudo, será importante para a próxima Sprint.|
+| Caminho B completo (com K6)             | + 45 min. Quem fizer e me enviar um vídeo (No slack) até 23h59 de hoje, será gratificado. E essa parte é um entregável na próxima sprint. |
 
 ## Impactos no seu projeto
 
@@ -48,7 +49,7 @@ Antes de clicar, alinhe o vocabulário. Você vai ser cobrado nas perguntas de r
 
 - **Escalabilidade** é a capacidade de aumentar recursos para atender mais demanda (na horizontal, mais máquinas; na vertical, máquinas maiores).
 - **Elasticidade** é escalar **automaticamente** nos dois sentidos: crescer no pico e encolher na baixa, pagando só pelo que usa.
-- **Alta disponibilidade** é continuar respondendo mesmo quando um componente falha. Aqui isso vem de ter instâncias em **duas Zonas de Disponibilidade**, do health check do ELB deixar de encaminhar tráfego para destinos que não respondem e do Auto Scaling poder substituir instâncias consideradas não íntegras quando o health check do ELB estiver habilitado no grupo.
+- **Alta disponibilidade** é continuar respondendo mesmo quando um componente falha. Aqui isso vem de distribuir instâncias em **duas Zonas de Disponibilidade** e de o health check do ELB evitar o envio de tráfego para destinos que não respondem.
 - **Elastic Load Balancer (ELB)** distribui o tráfego de entrada entre várias instâncias EC2. Nesta arquitetura, ele é a porta de entrada da aplicação e encaminha tráfego apenas para destinos considerados íntegros. [Definição](https://github.com/agodoi/m07-semana06/blob/main/doc/definicao-ElasticLoadBalancer.md)
 - **Grupo de destino** é o recurso associado ao ELB que mantém os destinos registrados e executa o health check neles. [Definição](https://github.com/agodoi/m07-semana06/blob/main/doc/definicao-GrupoDeDestino.md)
 - **AMI (Amazon Machine Image)** é uma imagem usada como modelo para iniciar novas instâncias, contendo a configuração necessária para reproduzir o servidor. O Auto Scaling usa a AMI definida no modelo de execução para criar novas instâncias sem que você configure tudo de novo.
@@ -56,7 +57,7 @@ Antes de clicar, alinhe o vocabulário. Você vai ser cobrado nas perguntas de r
 
 Tipos de balanceador que você vai ver no console:
 
-| Tipo Camada                         | OSI            | Uso principal                                                                                                 |
+| Tipo Camada         |          OSI      | Uso principal                                                                                                              |
 | ----------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------- |
 | **Application Load Balancer (ALB)** | 7 (aplicação)  | HTTP/HTTPS, roteia por URL, cabeçalhos etc. Ideal para aplicações web e microsserviços. **É o que usaremos.** |
 | **Network Load Balancer (NLB)**     | 4 (transporte) | TCP/UDP de altíssimo desempenho e baixa latência (jogos, streaming).                                          |
@@ -78,18 +79,18 @@ Várias telas do console demoram alguns segundos para refletir o que acabou de a
 
 ## Escolha o seu caminho
 
-|                                       | **Caminho A: Laboratório 6 do Módulo 10**  | **Caminho B: Arquitetura Corporativa** |
-| ------------------------------------- | --------------------------------------- | ------------------------------------------------ |
-| Quando usar                           | **Na aula de hoje.**                    | No seu projeto, ou se sobrar tempo. |
-| Ponto de partida                      | Instância **Web Server 1** do Módulo 10 | VPC\_Arquitetura\_Corp com bastion + EC2 privado |
-| Como gerar carga                      | Botão **Load Test** da aplicação PHP    | **K6** rodando no bastion host                   |
-| Por onde começar                      | **Passo-01**                            | Seção **Caminho B**, no final deste documento    |
+| **Caminho A: Laboratório do Módulo 10** **Caminho B: Arquitetura Corporativa**  |                                         |                                                  |
+| --------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------ |
+| Quando usar                                                                       | **Na aula de hoje.**                    | No seu projeto, ou se sobrar tempo.              |
+| Ponto de partida                                                                  | Instância **Web Server 1** do Módulo 10 | VPC\_Arquitetura\_Corp com bastion + EC2 privado |
+| Como gerar carga                                                                  | Botão **Load Test** da aplicação PHP    | **K6** rodando no bastion host                   |
+| Por onde começar                                                                  | **Passo-01**                            | Seção **Caminho B**, no final deste documento    |
 
 Os Passos 01 a 07 abaixo descrevem o **Caminho A**. O Caminho B reaproveita a lógica deles com os nomes da sua rede e é descrito separadamente para não misturar as coisas.
 
 ---
 
-# CAMINHO A: Laboratório 6 do Módulo 10
+# CAMINHO A: Laboratório do Módulo 10
 
 ## Passo-01: Criar uma AMI para o Auto Scaling
 
@@ -186,7 +187,7 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 **3.5)** Tipo de instância: **t2.micro**.
 
-**3.6)** Nome do par de chaves: **vockey**.
+**3.6)** Nome do par de chaves: selecione o par disponibilizado pelo Learner Lab: normalmente **vockey**.
 
 **3.7)** Em **Configurações de rede**, **não** selecione sub-rede (o grupo do Auto Scaling decide isso). Em **Firewall (grupos de segurança)**, marque **Selecionar grupo de segurança existente** e escolha **Web Security Group**.
 
@@ -254,9 +255,7 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 **Checkpoint:** o grupo aparece com **0 instâncias** e, em 1 a 2 minutos, com **2**. Atualize a tela até ver 2.
 
-**3.12)** Ainda em **Grupos do Auto Scaling**, selecione **Lab Auto Scaling Group**. Na aba **Detalhes**, localize **Verificações de integridade (Health checks)**, clique em **Editar** e habilite **Elastic Load Balancing health checks**. Mantenha um período de carência que dê tempo para a aplicação iniciar; se o console estiver com o padrão de **300 segundos**, pode mantê-lo. Salve a alteração.
-
-> Essa configuração é importante: por padrão, o Auto Scaling usa as verificações de integridade do EC2. Ao habilitar também as verificações do Elastic Load Balancing, o grupo pode substituir uma instância que continua em execução no EC2, mas cuja aplicação foi considerada **unhealthy** pelo balanceador.
+> **Aprofundamento:** em uma arquitetura de produção, também é possível configurar o Auto Scaling Group para considerar os health checks do Elastic Load Balancing ao avaliar a integridade das instâncias. **Neste Caminho A, não altere essa configuração**, pois o objetivo é manter o ambiente exatamente alinhado às etapas do Laboratório 6 oficial da AWS.
 
 ## Passo-04: Verificar se o balanceamento está funcionando
 
@@ -266,7 +265,7 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 **4.3)** Duas instâncias **Lab Instance** devem estar listadas. Aguarde até que o **Status** das duas mude para **íntegro** (healthy). Atualize a tela se necessário.
 
-> **Íntegro** significa que a instância respondeu ao health check com o código de sucesso configurado (nesta prática), **HTTP 200**, e que o ELB pode encaminhar tráfego para ela. Uma instância **não íntegra** deixa de receber tráfego do ALB. Como você habilitou os **Elastic Load Balancing health checks** no Auto Scaling Group, o Auto Scaling também pode marcar essa instância como não íntegra e substituí-la.
+> **Íntegro** significa que a instância respondeu ao health check com o código de sucesso configurado: nesta prática, **HTTP 200**: e que o ELB pode encaminhar tráfego para ela. Uma instância **não íntegra** deixa de receber tráfego do balanceador enquanto permanecer nesse estado.
 
 **4.4)** No painel à esquerda, escolha **Balanceadores de carga** e clique em **LabELB**.
 
@@ -286,74 +285,86 @@ Hoje o grupo tem 2 instâncias porque o mínimo é 2 e não há carga. Agora voc
 
 **5.1)** Mantenha a aba da aplicação aberta. Em outra aba, no console, pesquise e selecione **CloudWatch**.
 
-**5.2)** No painel à esquerda, expanda **Alarmes** e selecione **Todos os alarmes**. A política de rastreamento de destino cria e gerencia automaticamente alarmes do CloudWatch para controlar o **scale-out** e o **scale-in**. Os nomes normalmente contêm trechos como **AlarmHigh** e **AlarmLow**.
+**5.2)** No painel à esquerda, expanda **Alarmes** e selecione **Todos os alarmes**. Dois alarmes devem aparecer. Eles foram criados automaticamente pela política de rastreamento de destino do Auto Scaling. O objetivo é manter a utilização média de CPU próxima a **60%**, respeitando os limites de **2 a 6 instâncias**.
 
-- **AlarmHigh**: participa do **scale-out** quando a métrica permanece acima do nível necessário para manter o objetivo configurado.
-- **AlarmLow**: participa do **scale-in** quando a métrica cai o suficiente para que o grupo possa remover capacidade sem voltar imediatamente acima do objetivo.
+> **Somente se os alarmes não aparecerem em 60 segundos**, mesmo após atualizar a tela, siga o procedimento previsto no Laboratório 6 oficial:
+>
+> 1. Volte para **EC2**.
+> 2. No painel à esquerda, selecione **Grupos do Auto Scaling**.
+> 3. Selecione **Lab Auto Scaling Group**.
+> 4. Abra a aba **Escalabilidade automática**.
+> 5. Selecione **LabScalingPolicy** e escolha **Ações > Editar**.
+> 6. Altere o **Valor de destino** para **50** e selecione **Atualizar**.
+> 7. Volte ao **CloudWatch > Todos os alarmes** e confirme que os dois alarmes foram criados.
+>
+> Se você precisou realizar esse ajuste, considere **50%**, e não 60%, como o novo valor de destino durante as observações seguintes.
 
-> Não crie, edite nem exclua manualmente esses alarmes. Eles pertencem à política de **Target Tracking** e podem ser ajustados ou recriados automaticamente pelo Auto Scaling.
+**5.3)** Selecione o alarme que está em estado **OK** e que possui **AlarmHigh** no nome. O estado **OK** indica que ele ainda não foi acionado. O gráfico deve mostrar utilização de CPU baixa.
 
-**Se os alarmes ainda não aparecerem**, aguarde mais alguns instantes, atualize a tela e confirme em **EC2 > Grupos do Auto Scaling > Lab Auto Scaling Group > Escalabilidade automática** se a política **LabScalingPolicy** foi criada sem erro.
-
-**5.3)** Clique no alarme que tem **AlarmHigh** no nome. Ele deve estar no estado **OK**, que significa que **não** foi acionado, e o gráfico deve mostrar CPU baixa. Observe no próprio alarme o limiar e a quantidade de períodos de avaliação definidos automaticamente pela política.
+> No fluxo padrão do laboratório, o alarme de scale-out está relacionado à utilização média de CPU acima do valor de destino. Se você manteve a configuração original, esse valor é **60%**; se executou o procedimento de contingência acima, ele passou a ser **50%**.
 
 ### 5.B: Gerar carga
 
-**5.4)** Volte à aba da aplicação e clique em **Load Test**, ao lado do logotipo da AWS. A página passa a gerar requisições continuamente pelo ELB, que as distribui entre os destinos íntegros, aumentando a carga sobre o grupo. **Não feche esta aba.**
+**5.4)** Volte à aba da aplicação e clique em **Load Test**, ao lado do logotipo da AWS. O aplicativo passa a realizar cálculos para aumentar a utilização da CPU, e a página é atualizada automaticamente para gerar carga nas instâncias do grupo do Auto Scaling. **Não feche esta aba.**
 
-**5.5)** Volte ao CloudWatch. A cada 60 segundos, atualize a tela. Em poucos minutos você deve ver:
+**5.5)** Volte ao CloudWatch. A cada 60 segundos, atualize a tela. Em menos de 5 minutos, você deve observar o **AlarmLow** mudar para **OK** e o **AlarmHigh** mudar para **Em alarme**.
 
-- o gráfico do **AlarmHigh** subir à medida que a CPU média aumenta;
-- depois que a condição configurada pelo Target Tracking for satisfeita pelos períodos de avaliação mostrados no próprio alarme, o **AlarmHigh** mudar para **Em alarme**.
+- o gráfico do **AlarmHigh** deve indicar aumento da utilização média de CPU;
+- no fluxo padrão do laboratório, quando a CPU permanecer acima da linha de **60% por mais de aproximadamente 3 minutos**, o Auto Scaling deverá adicionar instâncias;
+- se você alterou anteriormente o valor de destino para **50%**, interprete o gráfico considerando esse novo valor.
 
-**5.6)** Com o AlarmHigh em alarme, vá ao **EC2** > **Instâncias**. Deve haver **mais de duas** instâncias **Lab Instance**. Elas foram criadas pelo Auto Scaling em resposta ao alarme.
+**5.6)** Aguarde até que o **AlarmHigh** esteja em estado **Em alarme**. Em seguida, vá ao **EC2 > Instâncias**. Deve haver **mais de duas** instâncias chamadas **Lab Instance**. Elas foram criadas pelo Auto Scaling em resposta ao alarme do CloudWatch.
 
-**5.7)** Abra **Grupos do Auto Scaling** > **Lab Auto Scaling Group** > aba **Atividade**. Cada linha conta o que o grupo fez e por quê ("Launching a new EC2 instance... in response to alarm..."). Leia uma delas.
+**5.7)** Abra **EC2 > Grupos do Auto Scaling > Lab Auto Scaling Group > Atividade**. Observe as ações de lançamento registradas pelo grupo e leia pelo menos uma delas.
 
-**Checkpoint:** você viu, na ordem, CPU subir → alarme disparar → instâncias novas → instâncias registradas como íntegras no LabGroup. Isso é **scale-out**.
+**Checkpoint:** você viu, na ordem, CPU subir → alarme disparar → novas instâncias serem iniciadas → novas instâncias entrarem no grupo. Isso é **scale-out**.
 
 > **Reflexão 4:** por que uma política de Auto Scaling não deve reagir a qualquer pico isolado de poucos segundos? O que poderia acontecer com a estabilidade da aplicação e com os custos se o grupo aumentasse e diminuísse a capacidade a cada oscilação momentânea?
 
-## Passo-06: Observar o scale-in
+## Passo-06: Encerrar a instância Web Server 1
 
-Elasticidade é nos dois sentidos. Sem esta parte você só viu metade do conceito.
+A **Web Server 1** serviu para gerar a AMI utilizada pelo grupo do Auto Scaling. Depois que as novas **Lab Instance** foram criadas a partir dessa AMI, a instância original não é mais necessária para a execução da aplicação. Este passo corresponde à **Tarefa 6 do Laboratório 6 oficial da AWS**.
 
-**6.1)** Feche a aba da aplicação com o **Load Test**. Isso interrompe a geração de carga.
+**6.1)** Em **Instâncias**, selecione **apenas** a **Web Server 1**. Confira duas vezes que nenhuma **Lab Instance** está marcada.
 
-**6.2)** No CloudWatch, acompanhe o **AlarmHigh** voltar para **OK** e o **AlarmLow** entrar em **Em alarme** quando a política entender que existe capacidade excedente. O Target Tracking é propositalmente mais conservador no **scale-in**, portanto essa redução pode levar mais tempo que o scale-out.
+**6.2)** No menu **Estado da instância**, selecione **Encerrar instância**.
 
-**6.3)** Quando o AlarmLow disparar, veja em **Grupos do Auto Scaling** > **Atividade** as instâncias sendo encerradas até voltar ao mínimo de 2.
+**6.3)** Na janela de confirmação, selecione **Encerrar**.
 
-> **Se não houver tempo para observar o scale-in automático:** vá ao grupo do Auto Scaling, clique em **Editar**, altere a **Capacidade desejada** para **2** e salve. O grupo encerrará as instâncias excedentes para atingir a nova capacidade desejada. **Isso é um redimensionamento manual e não substitui a demonstração do scale-in automático por Target Tracking**, mas permite observar o grupo reduzindo sua quantidade de instâncias.
+> Isso também ajuda a compreender que a AMI utilizada pelo modelo de execução é independente da instância que lhe deu origem. Se futuramente a aplicação mudar, será necessário gerar uma nova AMI e atualizar o modelo de execução utilizado pelo Auto Scaling.
 
-> **Reflexão 5:** por que a AWS configura o scale-in mais lento que o scale-out por padrão? Pense no custo de errar em cada direção.
-
-## Passo-07: Encerrar a instância Web Server 1
-
-A **Web Server 1** serviu apenas para gerar a AMI. As Lab Instance foram criadas **a partir da AMI**, não a partir dela, então encerrar a Web Server 1 **não afeta** o grupo do Auto Scaling nem a aplicação. Faça isso para confirmar.
-
-**7.1)** Em **Instâncias**, selecione **apenas** a **Web Server 1**. Confira duas vezes que nenhuma Lab Instance está marcada.
-
-**7.2)** No menu **Estado da instância**, selecione **Encerrar instância** e confirme.
-
-**7.3)** Recarregue a aplicação pelo DNS do ELB. Ela continua no ar.
-
-> Isso confirma a Reflexão 1: a AMI é independente da instância de origem. Se você mudar a aplicação, precisa gerar uma **nova AMI**, criar uma **nova versão do modelo de execução** apontando para essa AMI e garantir que o Auto Scaling Group passe a usar a versão atualizada. As instâncias que já estão em execução não são atualizadas automaticamente; para substituí-las de forma controlada, você pode usar um **Instance Refresh**.
-
-## Envio do trabalho (laboratório do Módulo 10)
+## Envio do trabalho (Laboratório 6: Módulo 10)
 
 - Selecione **Enviar** no topo das instruções do laboratório e confirme com **Sim**.
 - Após alguns minutos, o painel de notas mostra a pontuação por tarefa. Se não aparecer, selecione **Notas**. Você pode enviar várias vezes; o último envio é o que vale.
 - Para ver o feedback detalhado, selecione **Relatório de envio**.
 
-## Encerrando o laboratório
+> **Importante:** até este ponto, o Caminho A segue a ordem operacional do **Laboratório 6 oficial da AWS**. Faça o envio e confira o resultado da correção antes de executar a atividade complementar abaixo. Se precisar corrigir alguma tarefa e reenviar, faça isso antes de prosseguir.
 
-- Selecione **Encerrar laboratório** no topo da página e confirme com **Sim**.
-- Aguarde a mensagem "DELETE has been initiated..." e feche o painel.
+## Atividade complementar opcional: observar o scale-in
+
+Elasticidade acontece nos dois sentidos. O Laboratório 6 oficial encerra a parte avaliada após o scale-out e o encerramento da Web Server 1, mas, se houver tempo de aula, você pode observar também a redução automática da capacidade.
+
+**C.1)** Feche a aba da aplicação que está executando o **Load Test**. Isso interrompe a geração de carga.
+
+**C.2)** No CloudWatch, acompanhe o **AlarmHigh** voltar para **OK** e observe o comportamento do alarme associado ao scale-in. O Target Tracking costuma ser mais conservador ao remover capacidade, portanto a redução pode levar mais tempo do que o scale-out.
+
+**C.3)** Em **EC2 > Grupos do Auto Scaling > Lab Auto Scaling Group > Atividade**, observe se instâncias excedentes são encerradas até o grupo retornar à capacidade mínima de **2**.
+
+> Esta etapa é **complementar** e não faz parte das tarefas avaliadas descritas no Laboratório 6 oficial. Não altere manualmente a capacidade desejada apenas para forçar o resultado.
+
+> **Reflexão 5:** por que o scale-in costuma ser mais conservador que o scale-out? Pense no impacto de remover capacidade cedo demais em comparação com manter capacidade excedente por alguns minutos.
+
+## Finalizando o laboratório
+
+- Selecione **Finalizar Laboratório** no topo da página e confirme com **Sim**.
+- Aguarde a mensagem indicando que a exclusão foi iniciada e feche o painel pelo **X**.
 
 ---
 
 # CAMINHO B: Arquitetura Corporativa com teste K6
+
+> **Atenção:** a partir daqui você saiu do **Laboratório 6 oficial da AWS**. As etapas B-1 a B-9 são uma aplicação dos mesmos conceitos na arquitetura do projeto e **não fazem parte das tarefas avaliadas do Lab 6**.
 
 Use este caminho no projeto ou se sobrar tempo. A lógica é a mesma do Caminho A; o que muda é a rede (a sua), a aplicação (um Apache simples) e a forma de gerar carga (K6 a partir do bastion, contra o ELB).
 
@@ -542,7 +553,7 @@ k6 run test.js
 
 **B-8.6)** Em paralelo, no CloudWatch, acompanhe o **AlarmHigh** do Corp Auto Scaling Group. Neste caminho, a métrica é **ALBRequestCountPerTarget**: o número médio de requisições por destino aumenta, a condição de scale-out é atendida, o alarme entra em estado **Em alarme** e novas instâncias aparecem. Em **EC2 > Grupos do Auto Scaling > Corp Auto Scaling Group > Atividade**, acompanhe as ações de lançamento.
 
-**B-8.7)** Quando o K6 terminar, acompanhe o **scale-in** como no **Passo-06**.
+**B-8.7)** Quando o K6 terminar, acompanhe o **scale-in** seguindo a mesma lógica apresentada na **Atividade complementar opcional: observar o scale-in** do Caminho A.
 
 **B-8.8)** Experimente variar `target` (usuários virtuais) e a duração dos estágios. **Não passe de 1000 VUs** neste laboratório usando um bastion t2.micro, para evitar que o próprio gerador de carga se torne o gargalo ou fique sem recursos.
 
@@ -560,10 +571,10 @@ k6 run test.js
 
 | Conceito Onde você viu                  |                           |
 | --------------------------------------- | ------------------------- |
-| AMI como cópia independente             | Passo-01 e Passo-07       |
+| AMI como cópia independente             | Passo-01 e Passo-06       |
 | Health check e destino íntegro          | Passo-04                  |
 | Balanceamento entre zonas               | Passo-02 e Passo-04       |
 | Scale-out orientado por métrica         | Passo-05                  |
-| Scale-in                                | Passo-06                  |
+| Scale-in                                | Atividade complementar e B-8 |
 | Segmentação público/privado             | Etapa 2 do Passo-03 e B-5 |
 | Medição de carga (latência, RPS, erros) | B-8                       |
