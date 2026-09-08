@@ -33,16 +33,12 @@ O Auto Scaling também pode aumentar automaticamente o número de instâncias do
 
 ### Arquitetura Começa Assim:
 
-<img src="https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/starting-architecture.png" width="600">
+<img src="https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/starting-architecture.png" width="800">
 
 ### Arquitetura Finaliza Assim:
 
-<img src="https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/final-architecture.png" width="600">
+<img src="https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/final-architecture.png" width="800">
 
-<picture>
-   <source media="(prefers-color-scheme: light)" srcset="https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/final-architecture.png">
-   <img alt="Arquitetura Inicial" src="[YOUR-DEFAULT-IMAGE](https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/final-architecture.png)">
-</picture>
 
 ## Você tem 2 opções:
 
