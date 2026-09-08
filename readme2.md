@@ -343,7 +343,7 @@ A **Web Server 1** serviu para gerar a AMI utilizada pelo grupo do Auto Scaling.
 
 ## Atividade complementar opcional: observar o scale-in
 
-Elasticidade acontece nos dois sentidos. O Laboratório 6 oficial encerra a parte avaliada após o scale-out e o encerramento da Web Server 1, mas, se houver tempo de aula, você pode observar também a redução automática da capacidade.
+Elasticidade acontece nos dois sentidos. O Laboratório 6 oficial encerra a parte avaliada após o scale-out e o encerramento da Web Server 1, mas, se você quiser ir além, você pode observar também a redução automática da capacidade. Isso vai te ajudar nas próximas Sprints.
 
 **C.1)** Feche a aba da aplicação que está executando o **Load Test**. Isso interrompe a geração de carga.
 
