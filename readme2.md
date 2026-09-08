@@ -64,11 +64,11 @@ Tipos de balanceador que você vai ver no console:
 
 ### Arquitetura inicial
 
- <img src="https\://github.com/agodoi/TesteCargaAWS/blob/main/imgs/starting-architecture.png" width="500"> 
+ <img src="https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/starting-architecture.png" width="500"> 
 
 ### Arquitetura final
 
- <img src="https\://github.com/agodoi/TesteCargaAWS/blob/main/imgs/final-architecture.png" width="500"> 
+ <img src="https://github.com/agodoi/TesteCargaAWS/blob/main/imgs/final-architecture.png" width="500"> 
 
 ### Sobre o ícone de atualizar
 
