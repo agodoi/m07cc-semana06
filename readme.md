@@ -216,7 +216,7 @@ O modelo de execução diz ao Auto Scaling **como** criar cada instância: qual 
 
 - Selecione **Próximo**
 
-**Etapa 3: Opções avançadas**
+**Etapa 3: Próxima tela de opções**
 
 - Marque **Anexar a um balanceador de carga existente**.
 - Em **Grupos de destino de balanceador de carga existentes**, selecione **LabGroup | HTTP**.
