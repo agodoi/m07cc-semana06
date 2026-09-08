@@ -30,7 +30,7 @@ Ao final desta instrução você será capaz de:
 | Passo 4 (verificar balanceamento)       | 10 min   |
 | Passo 5 (teste de carga e observação)   | 25 min   |
 | Passo 6 (scale-in) e Passo 7 (encerrar) | 15 min   |
-| Caminho B completo (com K6)             | + 45 min --> quem fizer, ganhará uma gratificação|
+| Caminho B completo (com K6)             | + 45 min --> quem fizer, ganhará uma gratificação. Mandar vídeo até 23h59 de hoje no slack.|
 
 ## Impactos no seu projeto
 
